@@ -57,16 +57,16 @@ a {
 }
 
 .show {
-    display: block;
-  }
+    display: block !important;
+}
   
 .hide {
-display: none;
+    display: none !important;
 }
 
 .fade {
-animation-name: fade;
-animation-duration: 1.5s;
+    animation-name: fade;
+    animation-duration: 1.5s;
 }
   
 @keyframes fade {
