@@ -157,7 +157,7 @@ window.addEventListener('DOMContentLoaded', function () {
 
   function setClock(selector, endtime) {
     const timer = document.querySelector(selector),
-          days = timer.querySelector("#days"),
+          days = timer.querySelector('#days'),
           hours = timer.querySelector('#hours'),
           minutes = timer.querySelector('#minutes'),
           seconds = timer.querySelector('#seconds'),
@@ -173,6 +173,10 @@ window.addEventListener('DOMContentLoaded', function () {
 
       if (t.total <= 0) {
         clearInterval(timeInterval);
+        days.innerHTML = getZero(0);
+        hours.innerHTML = getZero(0);
+        minutes.innerHTML = getZero(0);
+        seconds.innerHTML = getZero(0);
       }
     }
   }
@@ -261,9 +265,27 @@ window.addEventListener('DOMContentLoaded', function () {
 
   }
 
-  new MenuCard("img/tabs/vegy.jpg", "vegy", 'Меню "Фитнес"', 'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!', 9, ".menu .container").render();
-  new MenuCard("img/tabs/post.jpg", "post", 'Меню "Постное"', 'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.', 14, ".menu .container").render();
-  new MenuCard("img/tabs/elite.jpg", "elite", 'Меню “Премиум”', 'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!', 21, ".menu .container").render(); // Forms
+  const getResource = async url => {
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      throw new Error(`Could not fetch ${url}, status: ${res.status}`);
+    }
+
+    return await res.json();
+  };
+
+  getResource('http://localhost:3000/menu').then(data => {
+    data.forEach(({
+      img,
+      altimg,
+      title,
+      descr,
+      price
+    }) => {
+      new MenuCard(img, altimg, title, descr, price, ".menu .container").render();
+    });
+  }); // Forms
 
   const forms = document.querySelectorAll('form');
   const message = {
@@ -272,10 +294,21 @@ window.addEventListener('DOMContentLoaded', function () {
     failure: 'Что-то пошло не так...'
   };
   forms.forEach(item => {
-    postData(item);
+    bindPostData(item);
   });
 
-  function postData(form) {
+  const PostData = async (url, data) => {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: data
+    });
+    return await res.json();
+  };
+
+  function bindPostData(form) {
     form.addEventListener('submit', e => {
       e.preventDefault();
       let statusMessage = document.createElement('img');
@@ -286,17 +319,8 @@ window.addEventListener('DOMContentLoaded', function () {
             `;
       form.insertAdjacentElement('afterend', statusMessage);
       const formData = new FormData(form);
-      const object = {};
-      formData.forEach(function (value, key) {
-        object[key] = value;
-      });
-      fetch('server.php', {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json'
-        },
-        body: JSON.stringify(object)
-      }).then(data => data.text()).then(data => {
+      const json = JSON.stringify(Object.fromEntries(formData.entries()));
+      PostData('http://localhost:3000/requests', json).then(data => {
         console.log(data);
         showThanksModal(message.success);
         statusMessage.remove();
@@ -327,7 +351,44 @@ window.addEventListener('DOMContentLoaded', function () {
       prevModalDialog.classList.remove('hide');
       closeModal();
     }, 4000);
+  } // Slider
+
+
+  const slideItems = document.querySelectorAll('.offer__slide'),
+        prervBtn = document.querySelector('.offer__slider-prev'),
+        nextBtn = document.querySelector('.offer__slider-next'),
+        current = document.querySelector('#current'),
+        total = document.querySelector('#total');
+  let slideIndex = 1;
+  total.textContent = getZero(slideItems.length);
+
+  function updateSlides() {
+    slideItems.forEach(item => {
+      item.classList.add('hide');
+    });
+    slideItems[slideIndex - 1].classList.remove('hide');
+    current.textContent = getZero(slideIndex);
   }
+
+  updateSlides();
+  prervBtn.addEventListener('click', () => {
+    if (slideIndex === 1) {
+      slideIndex = slideItems.length;
+    } else {
+      slideIndex--;
+    }
+
+    updateSlides();
+  });
+  nextBtn.addEventListener('click', () => {
+    if (slideIndex === slideItems.length) {
+      slideIndex = 1;
+    } else {
+      slideIndex++;
+    }
+
+    updateSlides();
+  });
 });
 
 /***/ })
