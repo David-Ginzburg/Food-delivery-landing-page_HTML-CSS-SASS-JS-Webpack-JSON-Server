@@ -13,7 +13,7 @@ window.addEventListener('DOMContentLoaded', function() {
     tabs('.tabheader__item', '.tabcontent', '.tabheader__items', 'tabheader__item_active');
     timer('.timer', '2021-05-11');
     modal('[data-modal]', '.modal', modalTimerId);
-    cards();
+    cards('.menu .container');
     forms('form', modalTimerId);
     calc();
     slider({
