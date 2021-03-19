@@ -2068,7 +2068,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_services__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../services/services */ "./src/js/services/services.js");
 
 
-function cards() {
+function cards(container) {
   class MenuCard {
     constructor(src, alt, title, descr, price, parentSelector, ...classes) {
       this.src = src;
@@ -2119,7 +2119,7 @@ function cards() {
       descr,
       price
     }) => {
-      new MenuCard(img, altimg, title, descr, price, ".menu .container").render();
+      new MenuCard(img, altimg, title, descr, price, container).render();
     });
   });
 }

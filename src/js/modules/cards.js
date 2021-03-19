@@ -1,6 +1,6 @@
 import { getResource } from '../services/services';
 
-function cards() {
+function cards(container) {
     class MenuCard {
         constructor(src, alt, title, descr, price, parentSelector, ...classes) {
             this.src = src;
@@ -45,7 +45,7 @@ function cards() {
     getResource('http://localhost:3000/menu')
         .then(data => {
             data.forEach(({img, altimg, title, descr, price}) => {
-                new MenuCard(img, altimg, title, descr, price, ".menu .container").render();
+                new MenuCard(img, altimg, title, descr, price, container).render();
             });
         });
 }
